@@ -1,0 +1,38 @@
+FROM node:lts-alpine3.9
+
+LABEL name="Docusaurus on docker latest-stable" \
+      maintainer="collin <collin@noreply.github.com>" \
+      version="1.14" \
+      release="latest" \
+      url="https://github.com/cpasternack/docusaurus-docker" \
+      summary="Docusaurus v1 for docker \
+          on Node 12.x, lts-alpine" \
+      description="Docusaurus v1 for docker \
+          on Node 12.x, lts-alpine" 
+
+# add curl for healthcheck
+RUN apk add --no-cache --update \
+  curl \
+  libc6-compat
+
+# run as our node user from base image
+# we delete the dockerfiles we don't need
+# this leaves us with a default v1 docusarus install
+# we can mount our own into the container
+USER node
+RUN mkdir ~/npm-global \
+    && npm config set prefix '~/npm-global' \
+    && echo 'export PATH=~/npm-global/bin:$PATH' > ~/.profile \
+    && mkdir -p /home/node/docusaurus \
+    && cd /home/node/docusaurus \
+    && npm install --global docusaurus-init \
+    && sh -l -c docusaurus-init \ 
+    && rm Dockerfile \
+    && rm docker-compose.yml
+
+EXPOSE 3000/tcp
+USER node
+WORKDIR /home/node/docusaurus/website
+
+CMD ["sh", "-l", "-c", "npm start"]
+HEALTHCHECK CMD curl -f -L http://localhost:3000/ || exit 1
