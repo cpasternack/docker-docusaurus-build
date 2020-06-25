@@ -6,6 +6,9 @@ Quick and easy Dockerfile and build for node, based on the node:lts-alpine image
 
 I saw a whole bunch of options for containers, but this was a chance to build some skeleton node Dockerfiles for other projects too.
 
+[Docusaurus Github] (https://github.com/facebook/docusaurus)
+[Node.js] (https://hub.docker.com/_/node)
+
 ## Run v1
 
 Run the test server node provides and iterate:
