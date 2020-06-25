@@ -35,8 +35,9 @@ ADD facebook/LICENSE.docusaurus /home/node/LICENSE.docusaurus
 ADD node/LICENSE.node /home/node/LICENSE.node
 
 EXPOSE 3000/tcp
+ENV SITE=${WEBSITE_NAME}
 USER node
-WORKDIR /home/node/docusaurus/${WEBSITE_NAME}
+WORKDIR /home/node/docusaurus/${SITE}
 
 CMD ["sh", "-l", "-c", "npm build"]
 HEALTHCHECK CMD curl -f -L http://localhost:3000/ || exit 1
