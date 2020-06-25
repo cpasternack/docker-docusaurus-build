@@ -1,7 +1,7 @@
 FROM node:lts-alpine3.9
 
 LABEL name="Docusaurus on docker latest-stable" \
-      maintainer="cpasternack <collin@noreply.github.com>" \
+      maintainer="collin <collin@noreply.github.com>" \
       version="1.14" \
       release="latest" \
       url="https://github.com/cpasternack/docusaurus-docker" \
@@ -16,19 +16,19 @@ RUN apk add --no-cache --update \
   libc6-compat
 
 # run as our node user from base image
-# we delete the dockerfiles we don't need
-# this leaves us with a default v1 docusarus install
+# this is the default v2 alpha docusarus install
+# the website initialised is ARG: WEBSITE_NAME
+# and template ARG: TEMPLATE
 # we can mount our own into the container
 USER node
+ARG WEBSITE_NAME="website"
+ARG TEMPLATE="classic"
 RUN mkdir ~/npm-global \
     && npm config set prefix '~/npm-global' \
     && echo 'export PATH=~/npm-global/bin:$PATH' > ~/.profile \
     && mkdir -p /home/node/docusaurus \
     && cd /home/node/docusaurus \
-    && npm install --global docusaurus-init \
-    && sh -l -c docusaurus-init \ 
-    && rm Dockerfile \
-    && rm docker-compose.yml
+    && sh -l -c npx @docusaurus/init@next init ${WEBSITE_NAME} ${TEMPLATE}
 
 # add license files
 ADD facebook/LICENSE.docusaurus /home/node/LICENSE.docusaurus
@@ -36,8 +36,7 @@ ADD node/LICENSE.node /home/node/LICENSE.node
 
 EXPOSE 3000/tcp
 USER node
-WORKDIR /home/node/docusaurus/website
+WORKDIR /home/node/docusaurus/${WEBSITE_NAME}
 
-# production builds website
-CMD ["sh", "-l", "-c", "npm run build"]
+CMD ["sh", "-l", "-c", "npm start"]
 HEALTHCHECK CMD curl -f -L http://localhost:3000/ || exit 1

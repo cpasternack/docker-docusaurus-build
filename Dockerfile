@@ -30,6 +30,10 @@ RUN mkdir ~/npm-global \
     && rm Dockerfile \
     && rm docker-compose.yml
 
+# add license files
+ADD facebook/LICENSE.docusaurus /home/node/LICENSE.docusaurus
+ADD node/LICENSE.node /home/node/LICENSE.node
+
 EXPOSE 3000/tcp
 USER node
 WORKDIR /home/node/docusaurus/website
